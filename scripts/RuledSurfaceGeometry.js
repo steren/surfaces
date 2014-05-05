@@ -18,18 +18,20 @@ THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps ) {
     for ( var i = 0; i < steps; i ++ ) {
     
         var v1 = curve1.getPoint(i*stepSize);
-        this.vertices.push( new THREE.Vertex(v1) );
+        this.vertices.push( v1 );
         
         var v2 = curve2.getPoint(i*stepSize);
-        this.vertices.push( new THREE.Vertex(v2) );
+        this.vertices.push( v2 );
     
     }
     
     var normal = new THREE.Vector3(0,0,1);
     
     for ( var i = 0; i < steps - 1; i++) {
-        var face = new THREE.Face4(2*i, 2*i+1, 2*i+3, 2*i+2, normal.clone() );
-        this.faces.push(face);
+        var face1 = new THREE.Face3(2*i, 2*i+1, 2*i+3, normal.clone() );
+        var face2 = new THREE.Face3(2*i, 2*i+3, 2*i+2, normal.clone() );
+        this.faces.push(face1);
+        this.faces.push(face2);
     }
 
 };
