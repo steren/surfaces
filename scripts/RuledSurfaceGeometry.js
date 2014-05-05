@@ -8,32 +8,49 @@ var THREE = THREE;
  * @param {Curve} curve2 
  * @param {Integer} [steps=10] number of subdivision of the curves
  */
-THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps ) {
+THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps, levels ) {
     THREE.Geometry.call( this );
 
-    steps = steps || 10; 
+    steps = steps || 20;
+    levels = levels || 10;
 
     var stepSize = 1.0 / steps;
 
-    for ( var i = 0; i < steps; i ++ ) {
-    
-        var v1 = curve1.getPoint(i*stepSize);
-        this.vertices.push( v1 );
-        
-        var v2 = curve2.getPoint(i*stepSize);
-        this.vertices.push( v2 );
-    
-    }
-    
+    // temporary normal
     var normal = new THREE.Vector3(0,0,1);
     
-    for ( var i = 0; i < steps - 1; i++) {
-        var face1 = new THREE.Face3(2*i, 2*i+1, 2*i+3, normal.clone() );
-        var face2 = new THREE.Face3(2*i, 2*i+3, 2*i+2, normal.clone() );
-        this.faces.push(face1);
-        this.faces.push(face2);
+    // create vertices and faces
+    var vStart, vEnd, v, sideStartIndex, faceStartIndex;
+    // for each side,
+    for ( var i = 0; i < steps; i ++ ) {
+        vStart = curve1.getPoint(i*stepSize);
+        vEnd = curve2.getPoint(i*stepSize);
+
+        this.vertices.push( vStart );
+
+        // index of the first vertex of the current side
+        sideStartIndex = (i-1) * (l+1);
+
+        for( var l = 0; l < levels; l++) {
+
+            v = new THREE.Vector3();
+            v.subVectors(vEnd, vStart);
+            v.multiplyScalar((l+1) / levels);
+            v.add(vStart);
+
+            this.vertices.push(v);
+
+            faceStartIndex = sideStartIndex + l;
+
+            // create two faces per level
+            if( i > 0) {
+                this.faces.push( new THREE.Face3(faceStartIndex, faceStartIndex+1, faceStartIndex + (levels+2), normal.clone() ));
+                this.faces.push( new THREE.Face3(faceStartIndex, faceStartIndex + (levels+2), faceStartIndex + (levels+1), normal.clone() ));
+            }
+        }
     }
 
+    // re-compute normals
     this.computeFaceNormals();
     this.computeVertexNormals();
 
