@@ -1,8 +1,11 @@
 // to avoid undefined warning with JSHint
 var THREE = THREE;
 
+    // should we draw wireframe and normals?
+    var drawHelpers = true;
+
     var camera, scene, renderer,
-    geometry, material, mesh;
+    geometry, material, mesh, pointLight;
 
     init();
     animate();
@@ -12,7 +15,7 @@ var THREE = THREE;
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.z = 100;
+        camera.position.y = 25;
         scene.add( camera );
 
         var linearCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 100));
@@ -22,12 +25,37 @@ var THREE = THREE;
         var bezierCurve2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
 
         geometry = new THREE.RuledSurfaceGeometry(linearCurve1, linearCurve2, 20 );
-        material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+        //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+        material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
+        //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
+
+        material.side = THREE.DoubleSide;
 
         mesh = new THREE.Mesh( geometry, material );
         scene.add( mesh );
 
-        renderer = new THREE.CanvasRenderer();
+        // lights
+        scene.add( new THREE.AmbientLight( 0x111111 ) );
+        pointLight = new THREE.PointLight( 0xffffff, 1 );
+        pointLight.position.x = 100;
+        pointLight.position.y = 100;
+        pointLight.position.z = 100;
+
+        scene.add( pointLight );
+
+        // helpers
+        if(drawHelpers) {
+            scene.add( new THREE.FaceNormalsHelper( mesh, 10 ) );
+            scene.add( new THREE.VertexNormalsHelper( mesh, 10 ) );
+            var wireHelper = new THREE.WireframeHelper( mesh ) ;
+            wireHelper.material.depthTest = false;
+            wireHelper.material.opacity = 0.25;
+            wireHelper.material.transparent = true;
+            scene.add(wireHelper);
+        }
+
+        // renderer
+        renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
 
         document.body.appendChild( renderer.domElement );
@@ -44,8 +72,11 @@ var THREE = THREE;
 
     function render() {
 
-        mesh.rotation.x += 0.01;
-        mesh.rotation.y += 0.02;
+        var time = - performance.now() * 0.001;
+
+        camera.position.x = 100 * Math.cos( time );
+        camera.position.z = 100 * Math.sin( time );
+        camera.lookAt( scene.position );
 
         renderer.render( scene, camera );
 

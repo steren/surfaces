@@ -34,6 +34,9 @@ THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps ) {
         this.faces.push(face2);
     }
 
+    this.computeFaceNormals();
+    this.computeVertexNormals();
+
 };
 
 THREE.RuledSurfaceGeometry.prototype = new THREE.Geometry();
