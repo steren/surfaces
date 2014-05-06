@@ -93,7 +93,7 @@ var THREE = THREE;
 
     function render() {
 
-        var time = - performance.now() * 0.001;
+        var time = - performance.now() * 0.0005;
 
         camera.position.x = 100 * Math.cos( time );
         camera.position.z = 100 * Math.sin( time );

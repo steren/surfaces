@@ -11,7 +11,7 @@ var THREE = THREE;
 THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps, levels ) {
     THREE.Geometry.call( this );
 
-    steps = steps || 20;
+    steps = steps || 50;
     levels = levels || 10;
 
     var stepSize = 1.0 / steps;
