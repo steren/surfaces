@@ -45,6 +45,16 @@ var THREE = THREE;
 
         // helpers
         if(drawHelpers) {
+            // draw curves
+            var lineGeo1 = createGeometryFromCurve(curve1);
+            var lineGeo2 = createGeometryFromCurve(curve2);
+            // "line" is a viewable curve
+            var line1 = new THREE.Line( lineGeo1,  new THREE.LineBasicMaterial( { color: 0x00ff00, opacity: 1, linewidth: 3 } ) );
+            var line2 = new THREE.Line( lineGeo2,  new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 1, linewidth: 3 } ) );
+            scene.add(line1);
+            scene.add(line2);
+            
+            // wireframe and normals
             scene.add( new THREE.FaceNormalsHelper( mesh, 10 ) );
             scene.add( new THREE.VertexNormalsHelper( mesh, 10 ) );
             var wireHelper = new THREE.WireframeHelper( mesh ) ;
@@ -83,5 +93,12 @@ var THREE = THREE;
     }
 
 
+    function createGeometryFromCurve(curve, steps) {
+        var lineGeometry = new THREE.Geometry();
 
-
+        var lineSteps = steps || 100;
+        for(var i = 0; i < lineSteps; i++) {
+            lineGeometry.vertices.push(curve.getPoint(i / lineSteps));
+        }
+        return lineGeometry;
+    }
