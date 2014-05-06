@@ -18,13 +18,24 @@ var THREE = THREE;
         camera.position.y = 25;
         scene.add( camera );
 
-        var linearCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 100));
-        var linearCurve2 = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0));
+        var curve1, curve2;
 
-        var bezierCurve1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 10, 10));
-        var bezierCurve2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
+        var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 100));
+        var lineCurve2 = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0));
 
-        geometry = new THREE.RuledSurfaceGeometry(linearCurve1, linearCurve2, 20 );
+        var curveQuad1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 50, 100));
+        var curveQuad2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
+
+        var c = 0.551915024494;
+        var curveBezier1 = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 1, 0), new THREE.Vector3(c, 1, 0), new THREE.Vector3(1, c, 0), new THREE.Vector3(1, 0, 0));
+        var h = 10;
+        var curveBezier2 = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 1, h), new THREE.Vector3(c, 1, h), new THREE.Vector3(1, c, h), new THREE.Vector3(1, 0, h));
+
+
+        curve1 = curveQuad1;
+        curve2 = curveQuad2;
+
+        geometry = new THREE.RuledSurfaceGeometry(curve1, curve2, 20 );
         //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
         material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
         //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
