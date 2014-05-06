@@ -22,6 +22,16 @@ var THREE = THREE;
 
         var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 100));
         var lineCurve2 = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0));
+        var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 50, 100), new THREE.Vector3(0, 50, 0));
+        var lineCurve2b = new THREE.LineCurve3(new THREE.Vector3(70, 50, 0), new THREE.Vector3(40, 50, 10));
+
+        var lineCurvePath1 = new THREE.CurvePath();
+        lineCurvePath1.add(lineCurve1);
+        lineCurvePath1.add(lineCurve1b);
+
+        var lineCurvePath2 = new THREE.CurvePath();
+        lineCurvePath2.add(lineCurve2);
+        lineCurvePath2.add(lineCurve2b);
 
         var curveQuad1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 50, 100));
         var curveQuad2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
@@ -32,8 +42,8 @@ var THREE = THREE;
         var curveBezier2 = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 1, h), new THREE.Vector3(c, 1, h), new THREE.Vector3(1, c, h), new THREE.Vector3(1, 0, h));
 
 
-        curve1 = curveQuad1;
-        curve2 = curveQuad2;
+        curve1 = lineCurvePath1;
+        curve2 = lineCurvePath2;
 
         geometry = new THREE.RuledSurfaceGeometry(curve1, curve2, 20 );
         //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );

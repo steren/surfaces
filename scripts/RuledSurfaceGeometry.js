@@ -1,12 +1,11 @@
 var THREE = THREE;
 
-// TODO: use CurvePath as input
-
 /**
  * A geometry defined by joining two curves. Faces are built by joining the curves with segments
  * @param {Curve} curve1
  * @param {Curve} curve2 
- * @param {Integer} [steps=10] number of subdivision of the curves
+ * @param {Integer} [steps=50] number of subdivision of the curves
+ * @param {levels} [levels=10] number of subdivisions the generated segments will have.
  */
 THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps, levels ) {
     THREE.Geometry.call( this );
