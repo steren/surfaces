@@ -2,22 +2,37 @@ var THREE = THREE;
 
 /**
  * A geometry defined by joining two curves. Faces are built by joining the curves with segments
- * @param {Curve} curve1
- * @param {Curve} curve2 
+ * @param {[Curve]} curves Array of curves from which to generate the surface, at least two are needed to create a surface.  
  * @param {Integer} [steps=50] number of subdivision of the curves
  * @param {levels} [levels=10] number of subdivisions the generated segments will have.
  */
-THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps, levels ) {
+THREE.RuledSurfaceGeometry = function ( curves, steps, levels ) {
     THREE.Geometry.call( this );
 
     steps = steps || 50;
     levels = levels || 10;
+    
+    for(var c = 0; c < curves.length - 1; c++) {
+        this.createSurfaceForCurves(curves[c], curves[c+1], steps, levels);
+    }
+    
+    // re-compute normals
+    this.computeFaceNormals();
+    this.computeVertexNormals();
 
+};
+
+THREE.RuledSurfaceGeometry.prototype = new THREE.Geometry();
+THREE.RuledSurfaceGeometry.prototype.constructor = THREE.RuledSurfaceGeometry;
+
+THREE.RuledSurfaceGeometry.prototype.createSurfaceForCurves = function(curve1, curve2, steps, levels) {
     var stepSize = 1.0 / steps;
-
+        
     // temporary normal
     var normal = new THREE.Vector3(0,0,1);
     
+    var vertexOffset = this.vertices.length;
+
     // create vertices and faces
     var vStart, vEnd, v, sideStartIndex, faceStartIndex;
     // for each side,
@@ -28,7 +43,7 @@ THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps, levels ) {
         this.vertices.push( vStart );
 
         // index of the first vertex of the current side
-        sideStartIndex = (i-1) * (l+1);
+        sideStartIndex = vertexOffset + (i-1) * (l+1);
 
         for( var l = 0; l < levels; l++) {
 
@@ -48,12 +63,4 @@ THREE.RuledSurfaceGeometry = function ( curve1, curve2, steps, levels ) {
             }
         }
     }
-
-    // re-compute normals
-    this.computeFaceNormals();
-    this.computeVertexNormals();
-
-};
-
-THREE.RuledSurfaceGeometry.prototype = new THREE.Geometry();
-THREE.RuledSurfaceGeometry.prototype.constructor = THREE.RuledSurfaceGeometry;
+}

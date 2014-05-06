@@ -18,22 +18,23 @@ var THREE = THREE;
         camera.position.y = 25;
         scene.add( camera );
 
-        var curve1, curve2;
-
-        var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 100));
-        var lineCurve2 = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0));
-        var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 50, 100), new THREE.Vector3(0, 50, 0));
-        var lineCurve2b = new THREE.LineCurve3(new THREE.Vector3(70, 50, 0), new THREE.Vector3(40, 50, 10));
-
+        var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 0));
+        var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 50, 0), new THREE.Vector3(0, 50, 50));
+        var lineCurve2 = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(50, 50, 0));
+        var lineCurve2b = new THREE.LineCurve3(new THREE.Vector3(50, 50, 0), new THREE.Vector3(50, 100, 50));
+        var lineCurve3 = new THREE.LineCurve3(new THREE.Vector3(100, -50, 0), new THREE.Vector3(100, 100, 50));
+    
         var lineCurvePath1 = new THREE.CurvePath();
         lineCurvePath1.add(lineCurve1);
         lineCurvePath1.add(lineCurve1b);
-
         var lineCurvePath2 = new THREE.CurvePath();
         lineCurvePath2.add(lineCurve2);
         lineCurvePath2.add(lineCurve2b);
+        var lineCurvePath3 = new THREE.CurvePath();
+        lineCurvePath3.add(lineCurve3);
 
         var curveQuad1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 50, 100));
+        
         var curveQuad2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
 
         var c = 0.551915024494;
@@ -41,11 +42,9 @@ var THREE = THREE;
         var h = 10;
         var curveBezier2 = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 1, h), new THREE.Vector3(c, 1, h), new THREE.Vector3(1, c, h), new THREE.Vector3(1, 0, h));
 
+        var curves = [lineCurvePath1, lineCurvePath2, lineCurvePath3];
 
-        curve1 = lineCurvePath1;
-        curve2 = lineCurvePath2;
-
-        geometry = new THREE.RuledSurfaceGeometry(curve1, curve2, 20 );
+        geometry = new THREE.RuledSurfaceGeometry(curves, 20);
         //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
         material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
         //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
@@ -67,17 +66,17 @@ var THREE = THREE;
         // helpers
         if(drawHelpers) {
             // draw curves
-            var lineGeo1 = createGeometryFromCurve(curve1);
-            var lineGeo2 = createGeometryFromCurve(curve2);
-            // "line" is a viewable curve
-            var line1 = new THREE.Line( lineGeo1,  new THREE.LineBasicMaterial( { color: 0x00ff00, opacity: 1, linewidth: 3 } ) );
-            var line2 = new THREE.Line( lineGeo2,  new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 1, linewidth: 3 } ) );
-            scene.add(line1);
-            scene.add(line2);
+            for(var c = 0; c < curves.length; c++) {
+                var lineGeo = curves[c].createPointsGeometry(100);
+                // "Line" is a viewable curve
+                var line = new THREE.Line( lineGeo,  new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 1, linewidth: 3 } ) );
+                scene.add(line);
+            }
+
             
             // wireframe and normals
-            scene.add( new THREE.FaceNormalsHelper( mesh, 10 ) );
-            scene.add( new THREE.VertexNormalsHelper( mesh, 10 ) );
+            scene.add( new THREE.FaceNormalsHelper( mesh, 3 ) );
+            scene.add( new THREE.VertexNormalsHelper( mesh, 3 ) );
             var wireHelper = new THREE.WireframeHelper( mesh ) ;
             wireHelper.material.depthTest = false;
             wireHelper.material.opacity = 0.25;
@@ -111,15 +110,4 @@ var THREE = THREE;
 
         renderer.render( scene, camera );
 
-    }
-
-
-    function createGeometryFromCurve(curve, steps) {
-        var lineGeometry = new THREE.Geometry();
-
-        var lineSteps = steps || 100;
-        for(var i = 0; i < lineSteps; i++) {
-            lineGeometry.vertices.push(curve.getPoint(i / lineSteps));
-        }
-        return lineGeometry;
     }
