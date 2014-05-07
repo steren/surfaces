@@ -16,8 +16,6 @@ var THREE = THREE;
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
         camera.position.z = 100;
-        controls = new THREE.OrbitControls( camera );
-        controls.addEventListener( 'change', render );
 
         var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 0));
         var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 50, 0), new THREE.Vector3(0, 50, 50));
@@ -91,15 +89,32 @@ var THREE = THREE;
 
         document.body.appendChild( renderer.domElement );
         
+        // camera controls
+        controls = new THREE.OrbitControls( camera, renderer.domElement); 
+        controls.addEventListener( 'change', render );
+        
         window.addEventListener( 'resize', onWindowResize, false );
         
+        // GUI
         var Parameters = function() {
             this.export = exportObj;
+            this.sketchfab = uploadToSketchfab;
+            this.token = 'YOUR API TOKEN';
+            this.title = 'Ruled Surface';
+            this.tags = 'surface';
+            this.description = 'Created with http://steren.fr/surfaces';
         };
         
         var params = new Parameters();
         var gui = new dat.GUI();
-        gui.add(params, 'export');
+
+        gui.add(params, 'export').name('download .obj');        
+        var f1 = gui.addFolder('Upload to Sketchfab');
+        f1.add(params, 'title');
+        f1.add(params, 'description');
+        f1.add(params, 'tags');
+        f1.add(params, 'token').name('API token');
+        f1.add(params, 'sketchfab').name('Upload');
 
     }
 
@@ -131,4 +146,35 @@ var THREE = THREE;
         var objString = exporter.parse(geometry);
         var content = "data:text/plain;charset=utf-8," + escape( objString );
         window.open( content, '_blank' );
+    }
+    
+    function uploadToSketchfab() {
+        
+        var exporter = new THREE.OBJExporter();
+        var objString = exporter.parse(geometry);
+        
+        var fd = new FormData();
+
+
+        fd.append('filenameModel', 'surface.obj');
+        fd.append('fileModel', new Blob([objString]));
+        fd.append('token', this.token);
+        fd.append('title', this.title);
+        fd.append('description', this.description);
+        fd.append('tags', this.tags);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", 'https://api.sketchfab.com/v1/models');
+
+        var result = function(data) {
+            var res = JSON.parse(xhr.responseText);
+            if(res.success) {
+                prompt("Success, open file at:", "https://sketchfab.com/models/" + res.result.id);
+            } else {
+                alert('Upload error: ' + res.error);
+            }
+        };
+
+        xhr.addEventListener("load", result, false);
+        xhr.send(fd);
     }
