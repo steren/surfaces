@@ -92,6 +92,14 @@ var THREE = THREE;
         document.body.appendChild( renderer.domElement );
         
         window.addEventListener( 'resize', onWindowResize, false );
+        
+        var Parameters = function() {
+            this.export = exportObj;
+        };
+        
+        var params = new Parameters();
+        var gui = new dat.GUI();
+        gui.add(params, 'export');
 
     }
 
@@ -115,13 +123,12 @@ var THREE = THREE;
     }
 
     function render() {
-
-        var time = - performance.now() * 0.0005;
-
-        //camera.position.x = 100 * Math.cos( time );
-        //camera.position.z = 100 * Math.sin( time );
-        //camera.lookAt( scene.position );
-
         renderer.render( scene, camera );
-
+    }
+    
+    function exportObj() {
+        var exporter = new THREE.OBJExporter();
+        var objString = exporter.parse(geometry);
+        var content = "data:text/plain;charset=utf-8," + escape( objString );
+        window.open( content, '_blank' );
     }
