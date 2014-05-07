@@ -5,7 +5,7 @@ var THREE = THREE;
     var drawHelpers = true;
 
     var camera, scene, renderer,
-    geometry, material, mesh, pointLight;
+    geometry, material, mesh, pointLight, controls;
 
     init();
     animate();
@@ -15,8 +15,9 @@ var THREE = THREE;
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
-        camera.position.y = 25;
-        scene.add( camera );
+        camera.position.z = 100;
+        controls = new THREE.OrbitControls( camera );
+        controls.addEventListener( 'change', render );
 
         var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 0));
         var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 50, 0), new THREE.Vector3(0, 50, 50));
@@ -89,6 +90,8 @@ var THREE = THREE;
         renderer.setSize( window.innerWidth, window.innerHeight );
 
         document.body.appendChild( renderer.domElement );
+        
+        window.addEventListener( 'resize', onWindowResize, false );
 
     }
 
@@ -100,13 +103,24 @@ var THREE = THREE;
 
     }
 
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        render();
+
+    }
+
     function render() {
 
         var time = - performance.now() * 0.0005;
 
-        camera.position.x = 100 * Math.cos( time );
-        camera.position.z = 100 * Math.sin( time );
-        camera.lookAt( scene.position );
+        //camera.position.x = 100 * Math.cos( time );
+        //camera.position.z = 100 * Math.sin( time );
+        //camera.lookAt( scene.position );
 
         renderer.render( scene, camera );
 
