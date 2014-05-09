@@ -2,7 +2,7 @@
 var THREE = THREE;
 
     // should we draw wireframe and normals?
-    var drawHelpers = true;
+    var drawHelpers = false;
 
     var camera, scene, renderer,
     geometry, material, mesh, pointLight, controls;
@@ -43,7 +43,7 @@ var THREE = THREE;
 
         var curves = [lineCurvePath1, lineCurvePath2, lineCurvePath3];
 
-        geometry = new THREE.RuledSurfaceGeometry(curves, 20);
+        geometry = new THREE.RuledSurfaceGeometry(curves, 20, 10, true, true);
         //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
         material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
         //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
