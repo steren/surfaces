@@ -105,13 +105,13 @@ THREE.RuledSurfaceGeometry.prototype.createLinesForCurves = function(curve1, cur
         v.x = v.x + barRadius
         this.vertices.push(v);
         v = vStart.clone()
-        v.y = v.y + barRadius
+        v.z = v.z + barRadius
         this.vertices.push(v);
         v = vStart.clone()
         v.x = v.x - barRadius
         this.vertices.push(v);
         v = vStart.clone()
-        v.y = v.y - barRadius
+        v.z = v.z - barRadius
         this.vertices.push(v);
 
         vEnd = curve2.getPoint(i*stepSize);
@@ -122,13 +122,13 @@ THREE.RuledSurfaceGeometry.prototype.createLinesForCurves = function(curve1, cur
         v.x = v.x + 1
         this.vertices.push(v);
         v = vEnd.clone()
-        v.y = v.y + 1
+        v.z = v.z + 1
         this.vertices.push(v);
         v = vEnd.clone()
         v.x = v.x - 1
         this.vertices.push(v);
         v = vEnd.clone()
-        v.y = v.y - 1
+        v.z = v.z - 1
         this.vertices.push(v);
 
         for( var l = 0; l < barRadialSegments; l++) {
