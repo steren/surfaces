@@ -11,18 +11,26 @@ var THREE = THREE;
     animate();
 
     function init() {
+        
+        // initialize parameters
+        var steps = 50;
+        var segments = 20;
+        var showSurface = true;
+        var showLines = false;
+
 
         scene = new THREE.Scene();
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
         camera.position.z = 100;
 
+    
+        // TEST with LINES
         var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 0));
         var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 50, 0), new THREE.Vector3(0, 50, 50));
         var lineCurve2 = new THREE.LineCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(50, 50, 0));
         var lineCurve2b = new THREE.LineCurve3(new THREE.Vector3(50, 50, 0), new THREE.Vector3(50, 100, 50));
         var lineCurve3 = new THREE.LineCurve3(new THREE.Vector3(100, -50, 0), new THREE.Vector3(100, 100, 50));
-    
         var lineCurvePath1 = new THREE.CurvePath();
         lineCurvePath1.add(lineCurve1);
         lineCurvePath1.add(lineCurve1b);
@@ -31,19 +39,59 @@ var THREE = THREE;
         lineCurvePath2.add(lineCurve2b);
         var lineCurvePath3 = new THREE.CurvePath();
         lineCurvePath3.add(lineCurve3);
+        var lineSet = [lineCurvePath1, lineCurvePath2, lineCurvePath3];
 
-        var curveQuad1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 50, 100));
-        
+        // var curveQuad1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 50, 100));
         var curveQuad2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
 
-        var c = 0.551915024494;
-        var curveBezier1 = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 1, 0), new THREE.Vector3(c, 1, 0), new THREE.Vector3(1, c, 0), new THREE.Vector3(1, 0, 0));
-        var h = 10;
-        var curveBezier2 = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 1, h), new THREE.Vector3(c, 1, h), new THREE.Vector3(1, c, h), new THREE.Vector3(1, 0, h));
 
-        var curves = [lineCurvePath1, lineCurvePath2, lineCurvePath3];
+        ////////////////////////
+        // Rotated Cylinder
+        ////////////////////////
+        steps = 20;
+        segments = 1;
+        showSurface = false;
+        showLines = true;
+        
+        // approximate a circle by four Bezier curves
+        var c = 0.551915024494; // magic parameter
+        var circleRadius = 50;
+        var circleHeight = 200;
+        var cylinderAngle = 2 * Math.PI / 3;
+        
+        function rotY(vec, angle) {
+            return vec.clone().applyEuler(new THREE.Euler(0, angle, 0));
+            
+        }
+        function rotYBezier(arc, angle) {
+            return new THREE.CubicBezierCurve3(rotY(arc.v0, angle), rotY(arc.v1, angle), rotY(arc.v2, angle), rotY(arc.v3, angle));
+        }
+                
+        var arcBottom = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 0, circleRadius), new THREE.Vector3(c * circleRadius, 0, circleRadius), new THREE.Vector3(circleRadius, 0, c * circleRadius), new THREE.Vector3(circleRadius, 0, 0));
+        var arcTop = new THREE.CubicBezierCurve3(new THREE.Vector3(0, circleHeight, circleRadius), new THREE.Vector3(c * circleRadius, circleHeight, circleRadius), new THREE.Vector3(circleRadius, circleHeight, c * circleRadius), new THREE.Vector3(circleRadius, circleHeight, 0));
 
-        geometry = new THREE.RuledSurfaceGeometry(curves, 20, 10, true, true);
+        var curveCircleBottom = new THREE.CurvePath();
+        curveCircleBottom.add( rotYBezier(arcBottom, 0                  ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, Math.PI / 2      ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, Math.PI          ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, 3 * Math.PI / 2  ) );
+        
+        var curveCircleTop = new THREE.CurvePath();
+        curveCircleTop.add( rotYBezier(arcTop, cylinderAngle                          ) );
+        curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + Math.PI / 2            ) );
+        curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + Math.PI                ) );
+        curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + 3 * Math.PI / 2        ) );
+                
+        var circleSet = [curveCircleBottom, curveCircleTop];
+
+
+
+        var curves = circleSet;
+
+        // Let the magic begin
+        geometry = new THREE.RuledSurfaceGeometry(curves, steps, segments, showSurface, showLines);
+        
+        
         //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
         material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
         //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
