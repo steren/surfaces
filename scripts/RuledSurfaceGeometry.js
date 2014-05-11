@@ -88,7 +88,7 @@ THREE.RuledSurfaceGeometry.prototype.createLinesForCurves = function(curve1, cur
     // create vertices and faces
     var vStart, vtStart, vEnd, vtEnd, v, sideStartIndex;
     // for each line
-    for ( var i = 0; i < steps; i ++ ) {
+    for ( var i = 0; i <= steps; i ++ ) {
 
         sideStartIndex = vertexOffset + i * barRadialSegments * 2;
 
