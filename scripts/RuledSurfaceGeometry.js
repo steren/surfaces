@@ -13,8 +13,6 @@ THREE.RuledSurfaceGeometry = function ( curves, steps, segments, surface, lines 
 
     steps = steps || 20;
     segments = segments || 10;
-    surface = surface || true;
-    lines = lines || false;
     
     for(var c = 0; c < curves.length - 1; c++) {
         if(surface) {
@@ -45,7 +43,7 @@ THREE.RuledSurfaceGeometry.prototype.createSurfaceForCurves = function(curve1, c
     // create vertices and faces
     var vStart, vEnd, v, sideStartIndex, faceStartIndex;
     // for each side,
-    for ( var i = 0; i < steps; i ++ ) {
+    for ( var i = 0; i <= steps; i ++ ) {
         vStart = curve1.getPoint(i*stepSize);
         vEnd = curve2.getPoint(i*stepSize);
 
