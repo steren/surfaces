@@ -48,11 +48,16 @@ var THREE = THREE;
         ////////////////////////
         // Rotated Cylinder
         ////////////////////////
-        steps = 20;
+        steps = 24;
         segments = 1;
         showSurface = false;
         showLines = true;
-        
+
+        //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+        material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
+        //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
+        material.side = THREE.DoubleSide;
+
         // approximate a circle by four Bezier curves
         var c = 0.551915024494; // magic parameter
         var circleRadius = 50;
@@ -69,37 +74,37 @@ var THREE = THREE;
                 
         var arcBottom = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 0, circleRadius), new THREE.Vector3(c * circleRadius, 0, circleRadius), new THREE.Vector3(circleRadius, 0, c * circleRadius), new THREE.Vector3(circleRadius, 0, 0));
         var arcTop = new THREE.CubicBezierCurve3(new THREE.Vector3(0, circleHeight, circleRadius), new THREE.Vector3(c * circleRadius, circleHeight, circleRadius), new THREE.Vector3(circleRadius, circleHeight, c * circleRadius), new THREE.Vector3(circleRadius, circleHeight, 0));
-
         var curveCircleBottom = new THREE.CurvePath();
-        curveCircleBottom.add( rotYBezier(arcBottom, 0                  ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, 0                ) );
         curveCircleBottom.add( rotYBezier(arcBottom, Math.PI / 2      ) );
         curveCircleBottom.add( rotYBezier(arcBottom, Math.PI          ) );
         curveCircleBottom.add( rotYBezier(arcBottom, 3 * Math.PI / 2  ) );
+        // two circles
+        curveCircleBottom.add( rotYBezier(arcBottom, 0                ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, Math.PI / 2      ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, Math.PI          ) );
+        curveCircleBottom.add( rotYBezier(arcBottom, 3 * Math.PI / 2  ) );
+        
         
         var curveCircleTop = new THREE.CurvePath();
         curveCircleTop.add( rotYBezier(arcTop, cylinderAngle                          ) );
         curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + Math.PI / 2            ) );
         curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + Math.PI                ) );
         curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + 3 * Math.PI / 2        ) );
-                
+        // two circles
+        curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle                          ) );
+        curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle + Math.PI / 2            ) );
+        curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle + Math.PI                ) );
+        curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle + 3 * Math.PI / 2        ) );
+
         var circleSet = [curveCircleBottom, curveCircleTop];
 
-
-
-        var curves = circleSet;
-
         // Let the magic begin
-        geometry = new THREE.RuledSurfaceGeometry(curves, steps, segments, showSurface, showLines);
+        geometry = new THREE.RuledSurfaceGeometry(circleSet, steps, segments, showSurface, showLines);
         
-        
-        //material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
-        material = new THREE.MeshLambertMaterial ( { color: 0xdddddd, shading: THREE.FlatShading } );
-        //material = new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } );
-
-        material.side = THREE.DoubleSide;
-
         mesh = new THREE.Mesh( geometry, material );
         scene.add( mesh );
+
 
         // lights
         scene.add( new THREE.AmbientLight( 0x111111 ) );
