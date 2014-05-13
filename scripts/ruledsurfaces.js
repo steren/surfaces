@@ -1,13 +1,17 @@
 // to avoid undefined warning with JSHint
 var THREE = THREE;
 
-var preset = 'pinakothek';
+var preset = 'wingspan';
 
     // should we draw wireframe and normals?
-    var drawHelpers = false;
+    var drawCurves = false;
+    var wireframe = false;
 
     var camera, scene, renderer,
-    geometry, material, mesh, pointLight, controls;
+    geometry, material, mesh, pointLight, pointLight2, controls;
+
+
+    var c = 0.551915024494; // magic parameter to draw circles from Bezier
 
     init();
     animate();
@@ -45,7 +49,6 @@ var preset = 'pinakothek';
 
 
             // approximate a circle by four Bezier curves
-            var c = 0.551915024494; // magic parameter
             var circleRadius = 50;
             var circleHeight = 200;
             var cylinderAngle = 2 * Math.PI / 3;
@@ -125,6 +128,79 @@ var preset = 'pinakothek';
             
             curves = lineSet; 
             
+        } else if (preset === 'tensegrity') {
+
+            steps = 10;
+            segments = 10;
+            showSurface = false;
+            showLines = true;
+            lineRadius = 0.5;
+
+            var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(50, 50, 50));
+            var lineCurvePath1 = new THREE.CurvePath();
+            lineCurvePath1.add(lineCurve1);
+
+            var lineCurve2 = new THREE.LineCurve3(new THREE.Vector3(0, 50, 0), new THREE.Vector3(50, 0, 0));
+            var lineCurvePath2 = new THREE.CurvePath();
+            lineCurvePath2.add(lineCurve2);
+            
+            var lineCurve3 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 50), new THREE.Vector3(0, 100, 0));
+            var lineCurvePath3 = new THREE.CurvePath();
+            lineCurvePath3.add(lineCurve3);
+
+            var lineCurve1b = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-50, -50, -50));
+
+            var lineSet = [lineCurvePath1, lineCurvePath2];
+            
+            curves = lineSet; 
+
+            
+        } else if (preset === 'dna') {
+            
+        } else if (preset === 'wingspan') {
+            
+            steps = 40;
+            segments = 20;
+            showSurface = false;
+            showLines = true;
+            lineRadius = 0.5;
+
+            var ay = 50;            
+            var az = 60;
+            
+            
+            var b0y = 30; 
+            var bx = -40;
+            var by = -60;
+            
+            var arcUp1 = new THREE.CurvePath();
+            arcUp1.add( new THREE.CubicBezierCurve3(new THREE.Vector3(0, ay, az), new THREE.Vector3(0, c * ay, az), new THREE.Vector3(0, 0, c * az), new THREE.Vector3(0, 0, 0) ));
+            arcUp1.add( new THREE.CubicBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -c * az), new THREE.Vector3(0, c * ay, -az), new THREE.Vector3(0, ay, -az) ));
+            
+            // same as arcUp1, but in reverse
+            var arcUp2 = new THREE.CurvePath();
+            arcUp2.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, ay, -az),
+                                                    new THREE.Vector3(0, c * ay, -az), 
+                                                    new THREE.Vector3(0, 0, -c * az), 
+                                                    new THREE.Vector3(0, 0, 0)
+                                                    ));
+            arcUp2.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, 0, 0),
+                                                    new THREE.Vector3(0, 0, c * az), 
+                                                    new THREE.Vector3(0, c * ay, az), 
+                                                    new THREE.Vector3(0, ay, az)
+                                                    ));
+
+            var arcDown = new THREE.CurvePath();
+            arcDown.add( new THREE.CubicBezierCurve3(new THREE.Vector3(bx, by, 0), new THREE.Vector3(bx, c * (by + b0y) , 0), new THREE.Vector3(c * bx, b0y, 0), new THREE.Vector3(0, b0y, 0) ));
+            arcDown.add( new THREE.CubicBezierCurve3(new THREE.Vector3(0, b0y, 0), new THREE.Vector3(- c * bx, b0y, 0), new THREE.Vector3(-bx, c * (by + b0y) , 0), new THREE.Vector3(-bx, by, 0) ));
+
+            
+            var wingspanSet = [arcUp1, arcDown, arcUp2];
+            
+            curves = wingspanSet;
+            
         }
 
         // Let the magic begin
@@ -135,25 +211,32 @@ var preset = 'pinakothek';
 
 
         // lights
-        scene.add( new THREE.AmbientLight( 0x111111 ) );
+        scene.add( new THREE.AmbientLight( 0x333333 ) );
         pointLight = new THREE.PointLight( 0xffffff, 1 );
         pointLight.position.x = 100;
         pointLight.position.y = 100;
         pointLight.position.z = 100;
-
         scene.add( pointLight );
+        pointLight2 = new THREE.PointLight( 0xffffff, 0.5 );
+        pointLight2.position.x = -100;
+        pointLight2.position.y = -100;
+        pointLight2.position.z = -100;
+        scene.add( pointLight2 );
+
 
         // helpers
-        if(drawHelpers) {
+        if(drawCurves) {
+            var colors = [0xff0000, 0x00ff00, 0x0000ff]
             // draw curves
             for(var c = 0; c < curves.length; c++) {
                 var lineGeo = curves[c].createPointsGeometry(100);
                 // "Line" is a viewable curve
-                var line = new THREE.Line( lineGeo,  new THREE.LineBasicMaterial( { color: 0xff0000, opacity: 1, linewidth: 3 } ) );
+                var line = new THREE.Line( lineGeo,  new THREE.LineBasicMaterial( { color: colors[c % 3], opacity: 1, linewidth: 3 } ) );
                 scene.add(line);
             }
+        }
 
-            
+        if(wireframe) {
             // wireframe and normals
             scene.add( new THREE.FaceNormalsHelper( mesh, 3 ) );
             scene.add( new THREE.VertexNormalsHelper( mesh, 3 ) );
