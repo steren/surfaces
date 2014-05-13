@@ -8,18 +8,19 @@ var THREE = THREE;
  * @param {boolean} [surface=true] should the geometry contain the ruled surface?
  * @param {boolean} [lines=false] should the geometry contain the ruled lines? will create solid bars.
  */
-THREE.RuledSurfaceGeometry = function ( curves, steps, segments, surface, lines ) {
+THREE.RuledSurfaceGeometry = function ( curves, steps, segments, surface, lines, lineRadius ) {
     THREE.Geometry.call( this );
 
     steps = steps || 20;
     segments = segments || 10;
+    lineRadius = lineRadius || 1;
     
     for(var c = 0; c < curves.length - 1; c++) {
         if(surface) {
             this.createSurfaceForCurves(curves[c], curves[c+1], steps, segments);
         }
         if(lines) {
-            this.createLinesForCurves(curves[c], curves[c+1], steps);
+            this.createLinesForCurves(curves[c], curves[c+1], steps, lineRadius);
         }
     }
     
@@ -72,10 +73,8 @@ THREE.RuledSurfaceGeometry.prototype.createSurfaceForCurves = function(curve1, c
     }
 }
 
-THREE.RuledSurfaceGeometry.prototype.createLinesForCurves = function(curve1, curve2, steps) {
+THREE.RuledSurfaceGeometry.prototype.createLinesForCurves = function(curve1, curve2, steps, barRadius) {
 
-    // half radius of the
-    var barRadius = 1;
     var barRadialSegments = 4;
 
     var stepSize = 1.0 / steps;
@@ -119,16 +118,16 @@ THREE.RuledSurfaceGeometry.prototype.createLinesForCurves = function(curve1, cur
 
         // this is temporary
         v = vEnd.clone()
-        v.x = v.x + 1
+        v.x = v.x + barRadius
         this.vertices.push(v);
         v = vEnd.clone()
-        v.z = v.z + 1
+        v.z = v.z + barRadius
         this.vertices.push(v);
         v = vEnd.clone()
-        v.x = v.x - 1
+        v.x = v.x - barRadius
         this.vertices.push(v);
         v = vEnd.clone()
-        v.z = v.z - 1
+        v.z = v.z - barRadius
         this.vertices.push(v);
 
         for( var l = 0; l < barRadialSegments; l++) {
