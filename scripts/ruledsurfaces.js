@@ -1,10 +1,10 @@
 // to avoid undefined warning with JSHint
 var THREE = THREE;
 
-var preset = 'wingspan';
+var preset = 'maewest';
 
     // should we draw wireframe and normals?
-    var drawCurves = false;
+    var drawCurves = true;
     var wireframe = false;
 
     var camera, scene, renderer,
@@ -40,18 +40,14 @@ var preset = 'wingspan';
         // var curveQuad1 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 50, 50), new THREE.Vector3(0, 50, 100));
         //var curveQuad2 = new THREE.QuadraticBezierCurve3(new THREE.Vector3(50, 0, 0), new THREE.Vector3(70, 50, 0), new THREE.Vector3(100, 10, 10));
         
+
+        
         if (preset == 'maewest') {
 
             steps = 24;
-            segments = 1;
-            showSurface = false;
-            showLines = true;
-
-
-            // approximate a circle by four Bezier curves
-            var circleRadius = 50;
-            var circleHeight = 200;
-            var cylinderAngle = 2 * Math.PI / 3;
+            segments = 10;
+            showSurface = true;
+            showLines = false;
 
             function rotY(vec, angle) {
                 return vec.clone().applyEuler(new THREE.Euler(0, angle, 0));
@@ -61,31 +57,44 @@ var preset = 'wingspan';
                 return new THREE.CubicBezierCurve3(rotY(arc.v0, angle), rotY(arc.v1, angle), rotY(arc.v2, angle), rotY(arc.v3, angle));
             }
 
+
+            // approximate a circle by four Bezier curves
+            var circleRadius = 60;
+            var circleHeight = 80;
+            var cylinderAngle =  4 * Math.PI /6 ;
+
+            //var c = 0.551915024494;
+
             var arcBottom = new THREE.CubicBezierCurve3(new THREE.Vector3(0, 0, circleRadius), new THREE.Vector3(c * circleRadius, 0, circleRadius), new THREE.Vector3(circleRadius, 0, c * circleRadius), new THREE.Vector3(circleRadius, 0, 0));
             var arcTop = new THREE.CubicBezierCurve3(new THREE.Vector3(0, circleHeight, circleRadius), new THREE.Vector3(c * circleRadius, circleHeight, circleRadius), new THREE.Vector3(circleRadius, circleHeight, c * circleRadius), new THREE.Vector3(circleRadius, circleHeight, 0));
+            
             var curveCircleBottom = new THREE.CurvePath();
             curveCircleBottom.add( rotYBezier(arcBottom, 0                ) );
             curveCircleBottom.add( rotYBezier(arcBottom, Math.PI / 2      ) );
             curveCircleBottom.add( rotYBezier(arcBottom, Math.PI          ) );
             curveCircleBottom.add( rotYBezier(arcBottom, 3 * Math.PI / 2  ) );
+
             // two circles
+            /*
             curveCircleBottom.add( rotYBezier(arcBottom, 0                ) );
             curveCircleBottom.add( rotYBezier(arcBottom, Math.PI / 2      ) );
             curveCircleBottom.add( rotYBezier(arcBottom, Math.PI          ) );
             curveCircleBottom.add( rotYBezier(arcBottom, 3 * Math.PI / 2  ) );
-
-
+            */
+            
             var curveCircleTop = new THREE.CurvePath();
             curveCircleTop.add( rotYBezier(arcTop, cylinderAngle                          ) );
             curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + Math.PI / 2            ) );
             curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + Math.PI                ) );
             curveCircleTop.add( rotYBezier(arcTop, cylinderAngle + 3 * Math.PI / 2        ) );
             // two circles
+            /*
             curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle                          ) );
             curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle + Math.PI / 2            ) );
             curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle + Math.PI                ) );
             curveCircleTop.add( rotYBezier(arcTop, - cylinderAngle + 3 * Math.PI / 2        ) );
-
+            */
+            
             var circleSet = [curveCircleBottom, curveCircleTop];
             
             curves = circleSet;
@@ -193,7 +202,7 @@ var preset = 'wingspan';
                                                     ));
 
             var arcDown = new THREE.CurvePath();
-            arcDown.add( new THREE.CubicBezierCurve3(new THREE.Vector3(bx, by, 0), new THREE.Vector3(bx, c * (by + b0y) , 0), new THREE.Vector3(c * bx, b0y, 0), new THREE.Vector3(0, b0y, 0) ));
+            arcDown.add( new THREE.CubicBezierCurve3(new THREE.Vector3(3 * bx, by, 0), new THREE.Vector3(bx, c * (by + b0y) , 0), new THREE.Vector3(c * bx, b0y, 0), new THREE.Vector3(0, b0y, 0) ));
             arcDown.add( new THREE.CubicBezierCurve3(new THREE.Vector3(0, b0y, 0), new THREE.Vector3(- c * bx, b0y, 0), new THREE.Vector3(-bx, c * (by + b0y) , 0), new THREE.Vector3(-bx, by, 0) ));
 
             
@@ -201,7 +210,126 @@ var preset = 'wingspan';
             
             curves = wingspanSet;
             
-        }
+        } else if (preset === 'lovers') {
+
+            var lineCurve1 = new THREE.LineCurve3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 200, 0));
+            var lineCurvePath1 = new THREE.CurvePath();
+            lineCurvePath1.add(lineCurve1);
+
+            var height = 100;
+            var radius = 50;
+
+            var circleRadius = 50;
+
+            var arcBottom = new THREE.CubicBezierCurve3(
+                                    new THREE.Vector3(0, 0, circleRadius), 
+                                    new THREE.Vector3(c * circleRadius, 0, circleRadius), 
+                                    new THREE.Vector3(circleRadius, 0, c * circleRadius), 
+                                    new THREE.Vector3(circleRadius, 0, 0)
+                                    );
+            var arc = new THREE.CurvePath();
+            arc.add(arcBottom);
+            
+            var loversSet = [lineCurvePath1, arc];
+            
+            curves = loversSet;
+
+        } else if (preset === 'small') {
+
+            steps = 100;
+            segments = 30;
+
+            h = 100;
+            r = 50;
+
+            var arcUp = new THREE.CurvePath();
+            arcUp.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, -h, 0),
+                                                    new THREE.Vector3(0, -h, 0), 
+                                                    new THREE.Vector3(0, -h, r), 
+                                                    new THREE.Vector3(0, -h + r, r)
+                                                    ));
+            arcUp.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, -h + r, r),
+                                                    new THREE.Vector3(0, -h, r), 
+                                                    new THREE.Vector3(0, -h, 0),
+                                                    new THREE.Vector3(0, -h, 0)
+                                                    ));
+            arcUp.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, -h, 0),
+                                                    new THREE.Vector3(0, -h, 0), 
+                                                    new THREE.Vector3(0, -h, -r), 
+                                                    new THREE.Vector3(0, -h + r, -r)
+                                                    ));
+            arcUp.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, -h + r, -r),
+                                                    new THREE.Vector3(0, -h, -r), 
+                                                    new THREE.Vector3(0, -h, 0),
+                                                    new THREE.Vector3(0, -h, 0)
+                                                    ));
+
+
+            var arcDown = new THREE.CurvePath();
+            arcDown.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(-r, -r, 0),
+                                                    new THREE.Vector3(-r, 0, 0), 
+                                                    new THREE.Vector3(0, 0, 0), 
+                                                    new THREE.Vector3(0, 0, 0)
+                                                    ));
+
+            arcDown.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, 0, 0),
+                                                    new THREE.Vector3(0, 0, 0), 
+                                                    new THREE.Vector3(r, 0, 0), 
+                                                    new THREE.Vector3(r, - r, 0)
+                                                    ));
+            arcDown.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(r, -r, 0),
+                                                    new THREE.Vector3(r, 0, 0), 
+                                                    new THREE.Vector3(0, 0, 0), 
+                                                    new THREE.Vector3(0, 0, 0)
+                                                    ));
+
+            arcDown.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, 0, 0),
+                                                    new THREE.Vector3(0, 0, 0), 
+                                                    new THREE.Vector3(-r, 0, 0), 
+                                                    new THREE.Vector3(-r, - r, 0)
+                                                    ));
+            var eggSet = [arcDown, arcUp];
+            
+            curves = eggSet;
+        } else if (preset === 'egg') {
+
+            steps = 100;
+            segments = 30;
+
+            h = 200;
+            r = 50;
+
+            var arcDown = new THREE.CurvePath();
+            arcDown.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(-r, -r, 0),
+                                                    new THREE.Vector3(-r, 0, 0), 
+                                                    new THREE.Vector3(0, 0, 0), 
+                                                    new THREE.Vector3(0, 0, 0)
+                                                    ));
+
+            arcDown.add( new THREE.CubicBezierCurve3(
+                                                    new THREE.Vector3(0, 0, 0),
+                                                    new THREE.Vector3(0, 0, 0), 
+                                                    new THREE.Vector3(r, 0, 0), 
+                                                    new THREE.Vector3(r, - r, 0)
+                                                    ));
+
+            var point = new THREE.CurvePath();
+            point.add(new THREE.LineCurve3(new THREE.Vector3(0, -h + r, r), new THREE.Vector3(0, -h+0.000001 + r, r)));
+
+
+            var eggSet = [arcDown, point];
+            
+            curves = eggSet;
+        } 
 
         // Let the magic begin
         geometry = new THREE.RuledSurfaceGeometry(curves, steps, segments, showSurface, showLines, lineRadius);
@@ -228,10 +356,10 @@ var preset = 'wingspan';
         if(drawCurves) {
             var colors = [0xff0000, 0x00ff00, 0x0000ff]
             // draw curves
-            for(var c = 0; c < curves.length; c++) {
-                var lineGeo = curves[c].createPointsGeometry(100);
+            for(var cur = 0; cur < curves.length; cur++) {
+                var lineGeo = curves[cur].createPointsGeometry(100);
                 // "Line" is a viewable curve
-                var line = new THREE.Line( lineGeo,  new THREE.LineBasicMaterial( { color: colors[c % 3], opacity: 1, linewidth: 3 } ) );
+                var line = new THREE.Line( lineGeo,  new THREE.LineBasicMaterial( { color: colors[cur % 3], opacity: 1, linewidth: 3 } ) );
                 scene.add(line);
             }
         }
